@@ -1,0 +1,40 @@
+name: MERN CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  mern-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Backend Env
+        run: |
+          echo "PORT=5000" > backend/.env
+          echo "MONGO_URI=mongodb://localhost:27017/testdb" >> backend/.env
+
+      - name: Create Frontend Env
+        run: |
+          echo "VITE_API_URL=http://localhost:5000" > frontend/.env
+
+      - name: Build Docker Containers
+        run: docker compose build
+
+      - name: Start Containers
+        run: docker compose up -d
+
+      - name: Show Running Containers
+        run: docker ps
+
+      - name: Stop Containers
+        run: docker compose down
